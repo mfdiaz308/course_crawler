@@ -9,9 +9,15 @@ from urllib.parse import urlparse
 #import csv
 import json
 from tqdm import tqdm
+import hashlib
 '''
 Scrapper for EdX
 '''
+
+# The name of each file is the hash of its url
+def generate_hash(url):
+   hash_obj = hashlib.sha256(url.encode())
+   return hash_obj.hexdigest()
 
 # Different sitemaps with the urls to scrap
 dictionary = {#'Bachelor': "Online Bachelors's Degrees",
@@ -55,6 +61,7 @@ for key in dictionary.keys():
   json_objects = []
   # For each url, we get the information
   for url_tag, filename in tqdm(zip(urls, filenames), total=len(urls), desc=key):
+    filename_hash = filename.replace(filename.split('/')[2], str(generate_hash(url_tag.text))+'.json')
     i = i + 1
     url = 'https://www.edx.org' + url_tag['href']
 
@@ -121,7 +128,7 @@ for key in dictionary.keys():
       #json_string = json.dumps(row, indent=4)
       
       # We write a new json file with the information scrapped
-      with open(filename, 'w') as f:
+      with open(filename_hash, 'w') as f:
         f.write(json.dumps(row, indent=4))
         json_objects.append(row)
       

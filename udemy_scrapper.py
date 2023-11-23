@@ -9,9 +9,15 @@ from urllib.parse import urlparse
 import csv
 from tqdm import tqdm
 import json
+import hashlib
 '''
 Scrapper for Udemy
 '''
+
+# The name of each file is the hash of its url
+def generate_hash(url):
+   hash_obj = hashlib.sha256(url.encode())
+   return hash_obj.hexdigest()
 
 # Different sitemaps with the urls to scrap
 dictionary = {'courses': "https://www.udemy.com/sitemap/courses.xml"}
@@ -131,7 +137,7 @@ for key in dictionary.keys():
         json_objects.append(row)
         
         # We write a new json file with the information scrapped
-        with open(f"udemy/courses/{j}.json", 'w') as f:
+        with open(f"udemy/courses/{generate_hash(url_tag.text)}.json", 'w') as f:
           f.write(json_string)
 
       # If there is any problem, we catch the exception and ignore that url and go for the next one

@@ -9,9 +9,15 @@ import csv
 import json
 #import multiprocessing
 from tqdm import tqdm
+import hashlib
 '''
 Scrapper for Coursera
 '''
+
+# The name of each file is the hash of its url
+def generate_hash(url):
+   hash_obj = hashlib.sha256(url.encode())
+   return hash_obj.hexdigest()
 
 # For each url, we get the information
 def process_url(url_tag, filename):
@@ -125,7 +131,8 @@ if __name__ == '__main__':
     #     pass
       
     for url_tag, filename in tqdm(zip(urls, filenames), total=len(urls), desc=key):
-      process_url(url_tag, filename)
+      filename_hash = filename.replace(filename.split('/')[2], str(generate_hash(url_tag.text))+'.json')
+      process_url(url_tag, filename_hash)
         
     print(key + ' ended!')
 
